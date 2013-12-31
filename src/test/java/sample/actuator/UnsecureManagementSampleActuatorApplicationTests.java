@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.boot.sample.actuator;
+package sample.actuator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -31,7 +31,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.sample.actuator.SampleActuatorApplication;
+import sample.actuator.SampleActuatorApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

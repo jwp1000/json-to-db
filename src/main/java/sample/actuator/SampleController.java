@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.boot.sample.actuator;
+package sample.actuator;
 
 import java.util.Collections;
 import java.util.Map;

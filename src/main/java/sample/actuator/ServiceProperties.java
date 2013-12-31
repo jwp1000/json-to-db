@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package org.springframework.boot.sample.actuator;
+package sample.actuator;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@ConfigurationProperties(name = "service", ignoreUnknownFields = false)
 @Component
-public class HelloWorldService {
+public class ServiceProperties {
 
-	@Autowired
-	private ServiceProperties configuration;
+	private String name = "World";
 
-	public String getHelloMessage() {
-		return "Hello " + this.configuration.getName();
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }
