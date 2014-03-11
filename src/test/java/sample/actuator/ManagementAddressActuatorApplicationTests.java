@@ -17,13 +17,14 @@
 package sample.actuator;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.RestTemplates;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -35,8 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
- * Integration tests for unsecured service endpoints (even with Spring Security on
- * classpath).
+ * Integration tests for separate management and main service ports.
  * 
  * @author Dave Syer
  */
@@ -45,37 +45,32 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @WebAppConfiguration
 @IntegrationTest
 @DirtiesContext
-@ActiveProfiles("unsecure-management")
-public class UnsecureManagementSampleActuatorApplicationTests {
+@ActiveProfiles("management-address")
+public class ManagementAddressActuatorApplicationTests {
+
+	@Autowired
+	private SecurityProperties security;
+
+	@Value("${server.port}")
+	private int port = 9010;
+
+	@Value("${management.port}")
+	private int managementPort = 9011;
 
 	@Test
-	public void testHomeIsSecure() throws Exception {
+	public void testHome() throws Exception {
 		@SuppressWarnings("rawtypes")
 		ResponseEntity<Map> entity = RestTemplates.get().getForEntity(
-				"http://localhost:8080", Map.class);
+				"http://localhost:" + port, Map.class);
 		assertEquals(HttpStatus.UNAUTHORIZED, entity.getStatusCode());
-		@SuppressWarnings("unchecked")
-		Map<String, Object> body = entity.getBody();
-		assertEquals("Wrong body: " + body, "Unauthorized", body.get("error"));
-		assertFalse("Wrong headers: " + entity.getHeaders(), entity.getHeaders()
-				.containsKey("Set-Cookie"));
 	}
 
 	@Test
-	public void testMetrics() throws Exception {
-		try {
-			testHomeIsSecure(); // makes sure some requests have been made
-		}
-		catch (AssertionError ex) {
-			// ignore;
-		}
-		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> entity = RestTemplates.get().getForEntity(
-				"http://localhost:8080/metrics", Map.class);
+	public void testHealth() throws Exception {
+		ResponseEntity<String> entity = RestTemplates.get().getForEntity(
+				"http://localhost:" + managementPort + "/admin/health", String.class);
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
-		@SuppressWarnings("unchecked")
-		Map<String, Object> body = entity.getBody();
-		assertTrue("Wrong body: " + body, body.containsKey("counter.status.401.root"));
+		assertEquals("ok", entity.getBody());
 	}
 
 }
